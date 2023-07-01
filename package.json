@@ -1,5 +1,5 @@
 {
-  "name": "oda-crawler",
+  "name": "crawler-scraper",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -7,11 +7,11 @@
     "test": "mocha test/**/*.js"
   },
   "dependencies": {
-    "config": "^3.3.7",
+    "config": "3.3.9",
     "puppeteer": "20.7.4"
   },
   "devDependencies": {
-    "mocha": "^9.2.0",
-    "sinon": "^13.0.1"
+    "mocha": "10.2.0",
+    "sinon": "15.2.0"
   }
 }
