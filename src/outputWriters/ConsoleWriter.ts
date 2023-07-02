@@ -1,7 +1,7 @@
-import WriterInterface from "./WriterInterface.js";
+import { Elements, WriterInterface } from "./types.js";
 
-export default class ConsoleWriter extends WriterInterface {
-  write(elements) {
+export default class ConsoleWriter implements WriterInterface {
+  write(elements: Elements) {
     if (elements.length === 0) {
       return;
     }

@@ -1,14 +1,15 @@
 import fs from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { Instructions } from "./types.js";
 
-const mapping = {
+const mapping: Record<string, string> = {
   oda: "./oda.json",
   finn: "./finn.json",
   test: "./test.json",
 };
 
-export const getInstructions = (name) => {
+export const getInstructions = (name: string) => {
   if (!mapping[name]) {
     throw `Instructions for ${name} not found`;
   }
@@ -16,5 +17,9 @@ export const getInstructions = (name) => {
   const file = fileURLToPath(import.meta.url);
   const directory = dirname(file);
 
-  return JSON.parse(fs.readFileSync(join(directory, mapping[name])));
+  const path = join(directory, mapping[name]);
+
+  const fileContent: string = require(path);
+
+  return JSON.parse(fileContent) as Instructions;
 };

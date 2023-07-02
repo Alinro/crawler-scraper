@@ -1,5 +1,6 @@
-import CrawlerInterface from "./crawlers/CrawlerInterface.js";
-import WriterInterface from "./outputWriters/WriterInterface.js";
+import { CrawlerInterface } from "./crawlers/types.js";
+import { InstructionStep, Instructions } from "./instructions/types.js";
+import { WriterInterface } from "./outputWriters/types.js";
 import { wait } from "./utils.js";
 
 import config from "config";
@@ -8,7 +9,7 @@ export default class ScrapingCoordinator {
   /**
    * @var {CrawlerInterface} crawler a class that interacts with the page and its content
    */
-  #crawler;
+  #crawler: CrawlerInterface;
 
   /**
    * @var {WriterInterface} outputWriter a reference to a class that implements the WriterInterface. it handles the output process
@@ -18,7 +19,7 @@ export default class ScrapingCoordinator {
   /**
    * @var {number} delayTimer how long to wait before processing the next page
    */
-  #delayTimer;
+  #delayTimer: number;
 
   /**
    * @var {object} instructions instructions that describe how to navigate and collect data from a page
@@ -33,7 +34,7 @@ export default class ScrapingCoordinator {
   /**
    * @var {Array} pagesToVisit a collection of pages that are going to be visited
    */
-  #pagesToVisit = [];
+  #pagesToVisit: string[] = [];
 
   /**
    *
@@ -41,12 +42,16 @@ export default class ScrapingCoordinator {
    * @param {WriterInterface} outputWriter
    * @param {object} instructions
    */
-  constructor(crawler, outputWriter, instructions) {
+  constructor(
+    crawler: CrawlerInterface,
+    outputWriter: WriterInterface,
+    instructions: Instructions
+  ) {
     this.#crawler = crawler;
     this.#instructions = instructions;
     this.#outputWriter = outputWriter;
 
-    this.#delayTimer = config.delay;
+    this.#delayTimer = config.get<number>("delay");
   }
 
   /**
@@ -93,7 +98,7 @@ export default class ScrapingCoordinator {
    * @param {string} address
    * @param {boolean} isFirstPage
    */
-  async #processPage(address, isFirstPage = false) {
+  async #processPage(address: string, isFirstPage = false) {
     this.#pagesAlreadyVisited.add(address);
     await this.#crawler.gotoAddress(address);
 
@@ -110,7 +115,7 @@ export default class ScrapingCoordinator {
     this.#outputWriter.write(newProducts);
   }
 
-  async #processLinks(linkInstructions) {
+  async #processLinks(linkInstructions: InstructionStep) {
     const { container, metadata } = linkInstructions;
     const newPagesToVisit = await this.#crawler.getElements(
       container,

@@ -1,30 +1,32 @@
 import fs from "fs";
-import WriterInterface from "./WriterInterface.js";
+import { Elements, WriterInterface } from "./types.js";
 import config from "config";
 
-export default class HtmlWriter extends WriterInterface {
-  write(elements) {
+export default class HtmlWriter implements WriterInterface {
+  write(elements: Record<string, string>[]) {
     if (elements.length === 0) {
       return;
     }
 
-    console.log(`Starting writing to html file ${config.htmlWriter.file}`);
+    const outputFileName = config.get<string>("htmlWriter.file");
 
-    this.writeStream = fs.createWriteStream(config.htmlWriter.file, {
+    console.log(`Starting writing to html file ${outputFileName}`);
+
+    const writeStream = fs.createWriteStream(outputFileName, {
       flags: "a",
     });
 
     let output = "";
 
-    output += this.#getTableHeader(elements);
+    output += this.#getTableHeader(elements, outputFileName);
     output += this.#getTableContent(elements);
 
-    this.writeStream.write(output);
-    this.writeStream.end();
+    writeStream.write(output);
+    writeStream.end();
   }
 
-  #getTableHeader(elements) {
-    const fileExists = fs.existsSync(config.htmlWriter.file);
+  #getTableHeader(elements: Elements, outputFileName: string) {
+    const fileExists = fs.existsSync(outputFileName);
 
     if (fileExists) {
       return "";
@@ -39,7 +41,7 @@ export default class HtmlWriter extends WriterInterface {
     return output;
   }
 
-  #getTableContent(elements) {
+  #getTableContent(elements: Elements) {
     let output = "";
 
     elements.forEach((element) => {

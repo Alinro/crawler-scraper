@@ -1,9 +1,9 @@
-import sinon from "sinon";
+import sinon, { SinonSpy } from "sinon";
 import assert from "assert";
-import ConsoleWriter from "../../src/outputWriters/ConsoleWriter.js";
+import ConsoleWriter from "../../outputWriters/ConsoleWriter.js";
 
 describe("ConsoleWriter", function () {
-  let consoleWriter, spy;
+  let consoleWriter: ConsoleWriter, spy: SinonSpy;
 
   beforeEach(function () {
     consoleWriter = new ConsoleWriter();
@@ -26,7 +26,7 @@ describe("ConsoleWriter", function () {
         { key3: "value3", key4: "value4" },
       ]);
 
-      assert(spy.callCount, 3);
+      assert(spy.callCount, "3");
       assert(spy.getCall(0), "Starting writing to console");
       assert(spy.getCall(1), "key1: value1 | key2: value2 |");
       assert(spy.getCall(2), "key3: value3 | key4: value4 |");

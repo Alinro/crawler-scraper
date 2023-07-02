@@ -1,32 +1,34 @@
-import puppeteer from "puppeteer";
+import puppeteer, { Browser, HTTPResponse, Page } from "puppeteer";
 import config from "config";
 
-import CrawlerInterface from "./CrawlerInterface.js";
+import { CrawlerInterface } from "./types.js";
+import { ContainerConfig, MetadataConfig } from "../instructions/types.js";
+import { Elements } from "../outputWriters/types.js";
 
-export default class PuppeteerCrawler extends CrawlerInterface {
+export default class PuppeteerCrawler implements CrawlerInterface {
   /**
    * @var {puppeteer.Browser} browser a reference to the browser instance that puppeteer launched
    */
-  #browser;
+  #browser: Browser | undefined;
 
   /**
    * @var {puppeteer.Page} page a reference to the page tab inside the browser controlled by puppeteer
    */
-  #page;
+  #page: Page | undefined;
 
   /**
    * @var {puppetter.ResponseForRequest} response a reference to the response data for the last page load
    */
-  #response;
+  #response: HTTPResponse | null | undefined;
 
   /**
    * Navigate to the specified address in the current tab
    *
    * @param {string} address
    */
-  async gotoAddress(address) {
+  async gotoAddress(address: string) {
     if (!this.#browser) {
-      this.#browser = await puppeteer.launch(config.puppeteer);
+      this.#browser = await puppeteer.launch(config.get("puppeteer"));
     }
 
     if (!this.#page) {
@@ -40,14 +42,10 @@ export default class PuppeteerCrawler extends CrawlerInterface {
     this.#response = await this.#page.goto(address);
   }
 
-  /**
-   * Collects the specified elements from the current page
-   *
-   * @param {object} containerConfig Contains details about identifying the containers
-   * @param {object} metadataConfig Contains details about identifying the elements belonging to the container
-   * @returns
-   */
-  async getElements(containerConfig, metadataConfig) {
+  async getElements(
+    containerConfig: ContainerConfig,
+    metadataConfig: MetadataConfig
+  ): Promise<Elements> {
     // const hasFunction = await this.#page.evaluate(() => {
     //   return window.nothing;
     // });
@@ -58,15 +56,15 @@ export default class PuppeteerCrawler extends CrawlerInterface {
 
     // debugger;
 
-    return this.#page.evaluate(
+    return this.#page!.evaluate(
       (containerConfig, metadataConfig) => {
-        debugger;
+        // debugger;
         const containers = document.querySelectorAll(containerConfig.selector);
 
-        const metadata = [];
+        const metadata: Record<string, string>[] = [];
 
         containers.forEach((container) => {
-          const element = {};
+          const element: Record<string, string> = {};
 
           for (const [key, { property, selector }] of Object.entries(
             metadataConfig
@@ -80,9 +78,9 @@ export default class PuppeteerCrawler extends CrawlerInterface {
                 continue;
               }
 
-              element[key] = htmlElement[property];
+              element[key] = htmlElement.getAttribute(property) || "";
             } else {
-              element[key] = container[property];
+              element[key] = container.getAttribute(property) || "";
             }
           }
 
@@ -100,6 +98,6 @@ export default class PuppeteerCrawler extends CrawlerInterface {
    * Stops puppeteer by closing the browser
    */
   async close() {
-    this.#browser.close();
+    this.#browser!.close();
   }
 }
