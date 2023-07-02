@@ -9,7 +9,7 @@ const mapping: Record<string, string> = {
   test: "./test.json",
 };
 
-export const getInstructions = (name: string) => {
+export const getInstructions = async (name: string) => {
   if (!mapping[name]) {
     throw `Instructions for ${name} not found`;
   }
@@ -19,7 +19,13 @@ export const getInstructions = (name: string) => {
 
   const path = join(directory, mapping[name]);
 
-  const fileContent: string = require(path);
+  const module = await import(path, {
+    assert: {
+      type: "json",
+    },
+  });
 
-  return JSON.parse(fileContent) as Instructions;
+  return module.default;
+
+  // return JSON.parse(fileContent) as Instructions;
 };

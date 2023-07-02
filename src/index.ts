@@ -5,7 +5,7 @@ import { getInstructions } from "./instructions/index.js";
 
 import config from "config";
 
-const instructions = getInstructions(config.get("instructionSet"));
+const instructions = await getInstructions(config.get("instructionSet"));
 
 const crawler = new PuppeteerCrawler();
 const outputWriter = getOutputWriterInstance(config.get("outputType"));
