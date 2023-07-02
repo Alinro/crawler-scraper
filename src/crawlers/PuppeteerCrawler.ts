@@ -78,9 +78,11 @@ export default class PuppeteerCrawler implements CrawlerInterface {
                 continue;
               }
 
-              element[key] = htmlElement.getAttribute(property) || "";
+              // TODO: fix type casting
+              element[key] =
+                String(htmlElement[property as keyof Element]) || "";
             } else {
-              element[key] = container.getAttribute(property) || "";
+              element[key] = String(container[property as keyof Element]) || "";
             }
           }
 

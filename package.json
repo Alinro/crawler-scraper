@@ -8,9 +8,14 @@
   },
   "dependencies": {
     "config": "3.3.9",
+    "esbuild": "0.18.11",
     "puppeteer": "20.7.4"
   },
   "devDependencies": {
+    "@es-exec/esbuild-plugin-serve": "0.0.5",
+    "@es-exec/esbuild-plugin-start": "0.0.5",
+    "@hyrious/esbuild-plugin-commonjs": "0.2.2",
+    "@tsconfig/node20": "1.0.2",
     "@types/config": "3.3.0",
     "@types/mocha": "10.0.1",
     "@types/puppeteer": "7.0.4",

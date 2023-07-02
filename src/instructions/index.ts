@@ -1,7 +1,7 @@
-import fs from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { Instructions } from "./types.js";
+import fs from "fs";
 
 const mapping: Record<string, string> = {
   oda: "./oda.json",
@@ -19,7 +19,7 @@ export const getInstructions = (name: string) => {
 
   const path = join(directory, mapping[name]);
 
-  const fileContent: string = require(path);
+  const fileContent: string = fs.readFileSync(path, "utf-8");
 
   return JSON.parse(fileContent) as Instructions;
 };
