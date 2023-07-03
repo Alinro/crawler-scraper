@@ -1,4 +1,4 @@
-import { Elements, WriterInterface } from "./types.js";
+import { Elements, WriterInterface } from "./types";
 
 export default class ConsoleWriter implements WriterInterface {
   write(elements: Elements) {

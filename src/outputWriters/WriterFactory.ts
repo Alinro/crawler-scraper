@@ -1,6 +1,6 @@
-import ConsoleWriter from "./ConsoleWriter.js";
-import HtmlWriter from "./HtmlWriter.js";
-import { WriterInterface } from "./types.js";
+import ConsoleWriter from "./ConsoleWriter";
+import HtmlWriter from "./HtmlWriter";
+import { WriterInterface } from "./types";
 
 // TODO: fix any
 const mapping: Record<string, any> = {

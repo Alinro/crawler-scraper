@@ -1,7 +1,7 @@
-import { CrawlerInterface } from "./crawlers/types.js";
-import { InstructionStep, Instructions } from "./instructions/types.js";
-import { WriterInterface } from "./outputWriters/types.js";
-import { wait } from "./utils.js";
+import { CrawlerInterface } from "./crawlers/types";
+import { InstructionStep, Instructions } from "./instructions/types";
+import { WriterInterface } from "./outputWriters/types";
+import { wait } from "./utils";
 
 import config from "config";
 

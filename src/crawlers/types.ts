@@ -1,5 +1,5 @@
-import { ContainerConfig, MetadataConfig } from "../instructions/types.js";
-import { Elements } from "../outputWriters/types.js";
+import { ContainerConfig, MetadataConfig } from "../instructions/types";
+import { Elements } from "../outputWriters/types";
 
 export interface CrawlerInterface {
   gotoAddress: (address: string) => void;

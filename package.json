@@ -2,11 +2,11 @@
   "name": "crawler-scraper",
   "version": "1.0.0",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "prebuild": "rimraf build",
     "build": "tsc --build",
-    "start": "ts-node src/index.ts",
+    "prestart": "npm run build",
+    "start": "node build/index.js",
     "pretest": "npm run build",
     "test": "mocha build/**/*.test.js"
   },

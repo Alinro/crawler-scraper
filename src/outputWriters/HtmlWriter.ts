@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Elements, WriterInterface } from "./types.js";
+import { Elements, WriterInterface } from "./types";
 import config from "config";
 
 export default class HtmlWriter implements WriterInterface {

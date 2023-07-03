@@ -1,0 +1,44 @@
+export default {
+  startAddress: "https://oda.com/no/",
+  clickOnce: {
+    container: {
+      selector: ".product-category",
+    },
+    metadata: {
+      link: {
+        property: "href",
+        selector: "a.product-category__link",
+      },
+    },
+  },
+  click: {
+    container: {
+      selector: ".child-category-headline",
+    },
+    metadata: {
+      link: {
+        property: "href",
+        selector: "a.headline",
+      },
+    },
+  },
+  item: {
+    container: {
+      selector: ".product-list-item",
+    },
+    metadata: {
+      price: {
+        property: "innerText",
+        selector: ".price",
+      },
+      name: {
+        property: "innerText",
+        selector: ".name-main",
+      },
+      unitPrice: {
+        property: "innerText",
+        selector: ".unit-price",
+      },
+    },
+  },
+};

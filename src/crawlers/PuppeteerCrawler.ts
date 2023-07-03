@@ -1,9 +1,9 @@
 import puppeteer, { Browser, HTTPResponse, Page } from "puppeteer";
 import config from "config";
 
-import { CrawlerInterface } from "./types.js";
-import { ContainerConfig, MetadataConfig } from "../instructions/types.js";
-import { Elements } from "../outputWriters/types.js";
+import { CrawlerInterface } from "./types";
+import { ContainerConfig, MetadataConfig } from "../instructions/types";
+import { Elements } from "../outputWriters/types";
 
 export default class PuppeteerCrawler implements CrawlerInterface {
   /**

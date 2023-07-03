@@ -1,12 +1,9 @@
-import fs from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
-import { Instructions } from "./types.js";
+import { Instructions } from "./types";
 
 const mapping: Record<string, string> = {
-  oda: "./oda.json",
-  finn: "./finn.json",
-  test: "./test.json",
+  oda: "./oda.js",
+  finn: "./finn.js",
+  test: "./test.js",
 };
 
 export const getInstructions = async (name: string) => {
@@ -14,18 +11,7 @@ export const getInstructions = async (name: string) => {
     throw `Instructions for ${name} not found`;
   }
 
-  const file = fileURLToPath(import.meta.url);
-  const directory = dirname(file);
+  const module = require(mapping[name]);
 
-  const path = join(directory, mapping[name]);
-
-  const module = await import(path, {
-    assert: {
-      type: "json",
-    },
-  });
-
-  return module.default;
-
-  // return JSON.parse(fileContent) as Instructions;
+  return module.default as Instructions;
 };
