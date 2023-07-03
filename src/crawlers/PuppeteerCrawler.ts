@@ -48,7 +48,6 @@ export default class PuppeteerCrawler implements CrawlerInterface {
   ): Promise<Elements> {
     return this.#page!.evaluate(
       (containerConfig, metadataConfig) => {
-        // debugger;
         const containers = document.querySelectorAll(containerConfig.selector);
 
         const metadata: Record<string, string>[] = [];
@@ -68,11 +67,9 @@ export default class PuppeteerCrawler implements CrawlerInterface {
                 continue;
               }
 
-              // TODO: fix as keyof type assertion
-              element[key] =
-                String(htmlElement[property as keyof Element]) || "";
+              element[key] = String(htmlElement[property]) || "";
             } else {
-              element[key] = String(container[property as keyof Element]) || "";
+              element[key] = String(container[property]) || "";
             }
           }
 

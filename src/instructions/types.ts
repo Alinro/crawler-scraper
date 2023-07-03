@@ -4,7 +4,7 @@ export interface ContainerConfig {
 
 export interface MetadataConfig {
   [key: string]: {
-    property: string;
+    property: keyof Element;
     selector: string;
   };
 }
