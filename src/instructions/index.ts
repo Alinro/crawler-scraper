@@ -1,17 +1,13 @@
 import { Instructions } from "./types";
 
-const mapping: Record<string, string> = {
-  oda: "./oda.js",
-  finn: "./finn.js",
-  local: "./local.js",
-};
+const ALLOWED_INSTRUCTION_SETS = ["oda", "finn", "local"];
 
 export const getInstructions = async (name: string) => {
-  if (!mapping[name]) {
+  if (!ALLOWED_INSTRUCTION_SETS.includes(name)) {
     throw `Instructions for ${name} not found`;
   }
 
-  const module = require(mapping[name]);
+  const module = require(`./${name}`);
 
   return module.default as Instructions;
 };
