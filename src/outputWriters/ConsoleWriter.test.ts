@@ -1,6 +1,6 @@
 import sinon, { SinonSpy } from "sinon";
 import assert from "assert";
-import ConsoleWriter from "../../outputWriters/ConsoleWriter.js";
+import ConsoleWriter from "./ConsoleWriter.js";
 
 describe("ConsoleWriter", function () {
   let consoleWriter: ConsoleWriter, spy: SinonSpy;

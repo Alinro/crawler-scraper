@@ -1,7 +1,8 @@
 {
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
-    "lib": ["es2023", "DOM"]
+    "lib": ["es2023", "DOM"],
+    "outDir": "build"
   },
   "ts-node": {
     "esm": true
