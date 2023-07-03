@@ -46,16 +46,6 @@ export default class PuppeteerCrawler implements CrawlerInterface {
     containerConfig: ContainerConfig,
     metadataConfig: MetadataConfig
   ): Promise<Elements> {
-    // const hasFunction = await this.#page.evaluate(() => {
-    //   return window.nothing;
-    // });
-    // if (!hasFunction) {
-    //   // workaround to force puppeteer to populate the source map so we can debug our code in the browser
-    //   this.#page.exposeFunction("nothing", () => null);
-    // }
-
-    // debugger;
-
     return this.#page!.evaluate(
       (containerConfig, metadataConfig) => {
         // debugger;
