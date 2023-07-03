@@ -1,19 +1,21 @@
-import PuppeteerCrawler from "./crawlers/PuppeteerCrawler.js";
-import ScrapingCoordinator from "./ScrapingCoordinator.js";
-import { getOutputWriterInstance } from "./outputWriters/WriterFactory.js";
-import { getInstructions } from "./instructions/index.js";
+import PuppeteerCrawler from "./crawlers/PuppeteerCrawler";
+import ScrapingCoordinator from "./ScrapingCoordinator";
+import { getOutputWriterInstance } from "./outputWriters/WriterFactory";
+import { getInstructions } from "./instructions/index";
 
 import config from "config";
 
-const instructions = await getInstructions(config.get("instructionSet"));
+(async () => {
+  const instructions = await getInstructions(config.get("instructionSet"));
 
-const crawler = new PuppeteerCrawler();
-const outputWriter = getOutputWriterInstance(config.get("outputType"));
+  const crawler = new PuppeteerCrawler();
+  const outputWriter = getOutputWriterInstance(config.get("outputType"));
 
-const scrapingCoordinator = new ScrapingCoordinator(
-  crawler,
-  outputWriter,
-  instructions
-);
+  const scrapingCoordinator = new ScrapingCoordinator(
+    crawler,
+    outputWriter,
+    instructions
+  );
 
-await scrapingCoordinator.start();
+  await scrapingCoordinator.start();
+})();

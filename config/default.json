@@ -1,5 +1,5 @@
 {
-  "instructionSet": "test",
+  "instructionSet": "local",
   "outputType": "console",
 
   "puppeteer": {

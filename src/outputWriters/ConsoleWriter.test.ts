@@ -1,23 +1,21 @@
-import sinon, { SinonSpy } from "sinon";
-import assert from "assert";
-import ConsoleWriter from "./ConsoleWriter.js";
+import ConsoleWriter from "./ConsoleWriter";
 
 describe("ConsoleWriter", function () {
-  let consoleWriter: ConsoleWriter, spy: SinonSpy;
+  let consoleWriter: ConsoleWriter, spy: jest.SpyInstance;
 
   beforeEach(function () {
     consoleWriter = new ConsoleWriter();
-    spy = sinon.spy(console, "log");
+    spy = jest.spyOn(console, "log");
   });
 
-  this.afterEach(function () {
-    spy.restore();
+  afterEach(function () {
+    jest.restoreAllMocks();
   });
 
   describe("write", function () {
     it("should not log anything when receiving an empty array", () => {
       consoleWriter.write([]);
-      assert(spy.notCalled);
+      expect(spy).not.toBeCalled();
     });
 
     it("should log correct information", () => {
@@ -26,10 +24,10 @@ describe("ConsoleWriter", function () {
         { key3: "value3", key4: "value4" },
       ]);
 
-      assert(spy.callCount, "3");
-      assert(spy.getCall(0), "Starting writing to console");
-      assert(spy.getCall(1), "key1: value1 | key2: value2 |");
-      assert(spy.getCall(2), "key3: value3 | key4: value4 |");
+      expect(spy).toBeCalledTimes(3);
+      expect(spy).toHaveBeenNthCalledWith(1, "Starting writing to console");
+      expect(spy).toHaveBeenNthCalledWith(2, "key1: value1 | key2: value2 | ");
+      expect(spy).toHaveBeenNthCalledWith(3, "key3: value3 | key4: value4 | ");
     });
   });
 });

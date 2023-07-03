@@ -3,7 +3,7 @@ import { Instructions } from "./types";
 const mapping: Record<string, string> = {
   oda: "./oda.js",
   finn: "./finn.js",
-  test: "./test.js",
+  local: "./local.js",
 };
 
 export const getInstructions = async (name: string) => {
