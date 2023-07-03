@@ -1,11 +1,19 @@
+import { Page } from "puppeteer";
 import { ContainerConfig, MetadataConfig } from "../instructions/types";
 import { Elements } from "../outputWriters/types";
 
 export interface CrawlerInterface {
-  gotoAddress: (address: string) => void;
+  init: () => Promise<void>;
+
+  gotoAddress: (address: string) => Promise<Page>;
+
   getElements: (
+    page: Page,
     containerConfig: ContainerConfig,
     metadataConfig: MetadataConfig
   ) => Promise<Elements>;
-  close: () => void;
+
+  closeBrowser: () => Promise<void>;
+
+  closePage: (page: Page) => Promise<void>;
 }

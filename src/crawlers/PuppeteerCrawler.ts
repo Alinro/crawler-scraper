@@ -11,15 +11,11 @@ export default class PuppeteerCrawler implements CrawlerInterface {
    */
   #browser: Browser | undefined;
 
-  /**
-   * @var {puppeteer.Page} page a reference to the page tab inside the browser controlled by puppeteer
-   */
-  #page: Page | undefined;
-
-  /**
-   * @var {puppetter.ResponseForRequest} response a reference to the response data for the last page load
-   */
-  #response: HTTPResponse | null | undefined;
+  async init() {
+    if (!this.#browser) {
+      this.#browser = await puppeteer.launch(config.get("puppeteer"));
+    }
+  }
 
   /**
    * Navigate to the specified address in the current tab
@@ -28,25 +24,28 @@ export default class PuppeteerCrawler implements CrawlerInterface {
    */
   async gotoAddress(address: string) {
     if (!this.#browser) {
-      this.#browser = await puppeteer.launch(config.get("puppeteer"));
+      throw new Error(
+        "Please initialize the browser instance before navigating to an address"
+      );
     }
 
-    if (!this.#page) {
-      this.#page = await this.#browser.newPage();
-      await this.#page.setViewport({
-        width: 1920,
-        height: 1080,
-      });
-    }
+    const page = await this.#browser.newPage();
+    await page.setViewport({
+      width: 1920,
+      height: 1080,
+    });
 
-    this.#response = await this.#page.goto(address);
+    await page.goto(address);
+
+    return page;
   }
 
   async getElements(
+    page: Page,
     containerConfig: ContainerConfig,
     metadataConfig: MetadataConfig
   ): Promise<Elements> {
-    return this.#page!.evaluate(
+    return page!.evaluate(
       (containerConfig, metadataConfig) => {
         const containers = document.querySelectorAll(containerConfig.selector);
 
@@ -86,7 +85,14 @@ export default class PuppeteerCrawler implements CrawlerInterface {
   /**
    * Stops puppeteer by closing the browser
    */
-  async close() {
-    this.#browser!.close();
+  async closeBrowser() {
+    await this.#browser!.close();
+  }
+
+  /**
+   * Close puppeteer page
+   */
+  async closePage(page: Page) {
+    await page.close();
   }
 }

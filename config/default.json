@@ -1,6 +1,7 @@
 {
   "instructionSet": "local",
   "outputType": "console",
+  "tabCount": 5,
 
   "puppeteer": {
     "headless": true,

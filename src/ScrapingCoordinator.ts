@@ -1,3 +1,4 @@
+import { Page } from "puppeteer";
 import { CrawlerInterface } from "./crawlers/types";
 import { InstructionStep, Instructions } from "./instructions/types";
 import { WriterInterface } from "./outputWriters/types";
@@ -36,6 +37,8 @@ export default class ScrapingCoordinator {
    */
   #pagesToVisit: string[] = [];
 
+  #tabCount: number = 1;
+
   /**
    *
    * @param {CrawlerInterface} crawler
@@ -52,41 +55,55 @@ export default class ScrapingCoordinator {
     this.#outputWriter = outputWriter;
 
     this.#delayTimer = config.get<number>("delay");
+    this.#tabCount = config.get<number>("tabCount");
   }
 
   /**
    * Starts crawling and scraping
    */
   async start() {
+    await this.#crawler.init();
+
     console.log(`Processing page: ${this.#instructions.startAddress}`);
-    await this.#processPage(this.#instructions.startAddress, true);
+    await this.#processAddress(this.#instructions.startAddress, true);
 
     while (this.#pagesToVisit.length > 0) {
-      const nextPage = this.#pagesToVisit.pop();
-
-      if (!nextPage) {
-        console.log(`Malformed address data. Skipping`);
-        continue;
-      }
-
-      if (this.#pagesAlreadyVisited.has(nextPage)) {
-        console.log(`Duplicate page: ${nextPage}. Skipping`);
-        continue;
-      }
-
       await wait(this.#delayTimer);
 
-      console.log(`Starting to process page: ${nextPage}`);
+      const promises: Promise<void>[] = [];
 
-      await this.#processPage(nextPage);
+      for (let i = 0; i < this.#tabCount; i++) {
+        promises.push(
+          this.#initializeAddressProcessing(this.#pagesToVisit.pop())
+        );
+      }
 
-      console.log(`Finished processing page ${nextPage}`);
+      await Promise.allSettled(promises);
+
       console.log(`${this.#pagesToVisit.length} pages remaining`);
     }
 
     console.log(`Finished processing. Closing browser`);
 
-    await this.#crawler.close();
+    await this.#crawler.closeBrowser();
+  }
+
+  async #initializeAddressProcessing(address: string | undefined) {
+    if (!address) {
+      console.log(`Empty or nonexistant page. Skipping`);
+      return;
+    }
+
+    if (this.#pagesAlreadyVisited.has(address)) {
+      console.log(`Duplicate page: ${address}. Skipping`);
+      return;
+    }
+
+    console.log(`Starting to process page: ${address}`);
+
+    await this.#processAddress(address);
+
+    console.log(`Finished processing page ${address}`);
   }
 
   /**
@@ -95,29 +112,34 @@ export default class ScrapingCoordinator {
    *  - collects new pages to visit
    *  - collects products
    *
-   * @param {string} address
-   * @param {boolean} isFirstPage
    */
-  async #processPage(address: string, isFirstPage = false) {
+  async #processAddress(address: string, isFirstPage = false) {
     this.#pagesAlreadyVisited.add(address);
-    await this.#crawler.gotoAddress(address);
+    const page = await this.#crawler.gotoAddress(address);
 
     if (isFirstPage) {
-      this.#processLinks(this.#instructions.clickOnce);
+      this.#processLinks(page, this.#instructions.clickOnce);
     }
 
-    this.#processLinks(this.#instructions.click);
+    this.#processLinks(page, this.#instructions.click);
 
     const { container, metadata } = this.#instructions.item;
-    const newProducts = await this.#crawler.getElements(container, metadata);
+    const newProducts = await this.#crawler.getElements(
+      page,
+      container,
+      metadata
+    );
 
     console.log(`Discovered ${JSON.stringify(newProducts)} products.`);
     this.#outputWriter.write(newProducts);
+
+    this.#crawler.closePage(page);
   }
 
-  async #processLinks(linkInstructions: InstructionStep) {
+  async #processLinks(page: Page, linkInstructions: InstructionStep) {
     const { container, metadata } = linkInstructions;
     const newPagesToVisit = await this.#crawler.getElements(
+      page,
       container,
       metadata
     );
