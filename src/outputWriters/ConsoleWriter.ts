@@ -1,7 +1,7 @@
-import { Elements, WriterInterface } from "./types";
+import { Elements, AbstractWriter } from "./types";
 
-export default class ConsoleWriter implements WriterInterface {
-  write(elements: Elements) {
+export default class ConsoleWriter extends AbstractWriter {
+  async write(elements: Elements) {
     if (elements.length === 0) {
       return;
     }

@@ -1,17 +1,19 @@
 import ConsoleWriter from "./ConsoleWriter";
+import DatabaseWriter from "./DatabaseWriter";
 import HtmlWriter from "./HtmlWriter";
-import { WriterInterface } from "./types";
+import { AbstractWriter } from "./types";
 
-// TODO: fix any
-const mapping: Record<string, any> = {
-  console: ConsoleWriter,
-  html: HtmlWriter,
+// workaround to not deal with TS types
+const mapping: Record<string, () => AbstractWriter> = {
+  console: () => new ConsoleWriter(),
+  html: () => new HtmlWriter(),
+  database: () => new DatabaseWriter(),
 };
 
-export const getOutputWriterInstance = (type: string): WriterInterface => {
+export const getOutputWriterInstance = (type: string): AbstractWriter => {
   if (!mapping[type]) {
     throw `Output writer with type ${type} does not exist`;
   }
 
-  return new mapping[type]();
+  return mapping[type]();
 };

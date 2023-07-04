@@ -45,7 +45,7 @@ export default class PuppeteerCrawler implements CrawlerInterface {
     containerConfig: ContainerConfig,
     metadataConfig: MetadataConfig
   ): Promise<Elements> {
-    return page!.evaluate(
+    return page?.evaluate(
       (containerConfig, metadataConfig) => {
         const containers = document.querySelectorAll(containerConfig.selector);
 
@@ -86,7 +86,7 @@ export default class PuppeteerCrawler implements CrawlerInterface {
    * Stops puppeteer by closing the browser
    */
   async closeBrowser() {
-    await this.#browser!.close();
+    await this.#browser?.close();
   }
 
   /**

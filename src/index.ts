@@ -6,16 +6,20 @@ import { getInstructions } from "./instructions/index";
 import config from "config";
 
 (async () => {
-  const instructions = await getInstructions(config.get("instructionSet"));
+  try {
+    const instructions = await getInstructions(config.get("instructionSet"));
 
-  const crawler = new PuppeteerCrawler();
-  const outputWriter = getOutputWriterInstance(config.get("outputType"));
+    const crawler = new PuppeteerCrawler();
+    const outputWriter = getOutputWriterInstance(config.get("outputType"));
 
-  const scrapingCoordinator = new ScrapingCoordinator(
-    crawler,
-    outputWriter,
-    instructions
-  );
+    const scrapingCoordinator = new ScrapingCoordinator(
+      crawler,
+      outputWriter,
+      instructions
+    );
 
-  await scrapingCoordinator.start();
+    await scrapingCoordinator.start();
+  } catch (ex) {
+    console.error(ex);
+  }
 })();

@@ -1,9 +1,9 @@
 import fs from "fs";
-import { Elements, WriterInterface } from "./types";
+import { Elements, AbstractWriter } from "./types";
 import config from "config";
 
-export default class HtmlWriter implements WriterInterface {
-  write(elements: Record<string, string>[]) {
+export default class HtmlWriter extends AbstractWriter {
+  async write(elements: Record<string, string>[]) {
     if (elements.length === 0) {
       return;
     }

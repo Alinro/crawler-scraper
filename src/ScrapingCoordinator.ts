@@ -1,7 +1,7 @@
 import { Page } from "puppeteer";
 import { CrawlerInterface } from "./crawlers/types";
 import { InstructionStep, Instructions } from "./instructions/types";
-import { WriterInterface } from "./outputWriters/types";
+import { AbstractWriter } from "./outputWriters/types";
 import { wait } from "./utils";
 
 import config from "config";
@@ -12,10 +12,7 @@ export default class ScrapingCoordinator {
    */
   #crawler: CrawlerInterface;
 
-  /**
-   * @var {WriterInterface} outputWriter a reference to a class that implements the WriterInterface. it handles the output process
-   */
-  #outputWriter;
+  #outputWriter: AbstractWriter;
 
   /**
    * @var {number} delayTimer how long to wait before processing the next page
@@ -39,15 +36,9 @@ export default class ScrapingCoordinator {
 
   #tabCount: number = 1;
 
-  /**
-   *
-   * @param {CrawlerInterface} crawler
-   * @param {WriterInterface} outputWriter
-   * @param {object} instructions
-   */
   constructor(
     crawler: CrawlerInterface,
-    outputWriter: WriterInterface,
+    outputWriter: AbstractWriter,
     instructions: Instructions
   ) {
     this.#crawler = crawler;
@@ -86,6 +77,7 @@ export default class ScrapingCoordinator {
     console.log(`Finished processing. Closing browser`);
 
     await this.#crawler.closeBrowser();
+    await this.#outputWriter.close();
   }
 
   async #initializeAddressProcessing(address: string | undefined) {
@@ -131,7 +123,7 @@ export default class ScrapingCoordinator {
     );
 
     console.log(`Discovered ${JSON.stringify(newProducts)} products.`);
-    this.#outputWriter.write(newProducts);
+    await this.#outputWriter.write(newProducts);
 
     this.#crawler.closePage(page);
   }

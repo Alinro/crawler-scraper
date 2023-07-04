@@ -1,5 +1,7 @@
 export type Elements = Record<string, string>[];
 
-export interface WriterInterface {
-  write: (elements: Elements) => void;
+export abstract class AbstractWriter {
+  abstract write(elements: Elements): Promise<void>;
+
+  async close() {}
 }
