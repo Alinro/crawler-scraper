@@ -3,12 +3,12 @@ import { Elements, AbstractWriter } from "./types";
 import config from "config";
 
 export default class HtmlWriter extends AbstractWriter {
-  async write(elements: Record<string, string>[]) {
+  async write(address: string, elements: Record<string, string>[]) {
     if (elements.length === 0) {
       return;
     }
 
-    const outputFileName = config.get<string>("htmlWriter.file");
+    const outputFileName = config.get<string>("writer.html.file");
 
     console.log(`Starting writing to html file ${outputFileName}`);
 

@@ -72,7 +72,9 @@ export default class PuppeteerCrawler implements CrawlerInterface {
             }
           }
 
-          metadata.push(element);
+          if (Object.keys(element).length !== 0) {
+            metadata.push(element);
+          }
         });
 
         return metadata;

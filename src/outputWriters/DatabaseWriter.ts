@@ -1,34 +1,33 @@
 import { Collection, MongoClient } from "mongodb";
 import { AbstractWriter } from "./types";
+import config from "config";
 
 export default class DatabaseWriter extends AbstractWriter {
   #client: MongoClient | undefined;
-  #col: Collection | undefined;
+  #collection: Collection | undefined;
 
   async init() {
-    try {
-      this.#client = await MongoClient.connect("mongodb://localhost");
-      const db = this.#client.db("testing");
-      this.#col = db.collection("test-col");
-    } catch (ex) {
-      console.log(ex);
-    }
+    const { connectionString, database, collection } = config.get<{
+      connectionString: string;
+      database: string;
+      collection: string;
+    }>("writer.database");
+
+    this.#client = await MongoClient.connect(connectionString);
+    const db = this.#client.db(database);
+    this.#collection = db.collection(collection);
   }
 
-  async write(elements: Record<string, string>[]) {
+  async write(address: string, elements: Record<string, string>[]) {
     if (elements.length === 0) {
       return;
     }
 
-    if (!this.#col) {
+    if (!this.#collection) {
       await this.init();
     }
 
-    try {
-      await this.#col?.insertMany(elements);
-    } catch (ex) {
-      console.log(ex);
-    }
+    await this.#collection?.insertOne({ address, metadata: elements });
   }
 
   async close() {

@@ -123,7 +123,7 @@ export default class ScrapingCoordinator {
     );
 
     console.log(`Discovered ${JSON.stringify(newProducts)} products.`);
-    await this.#outputWriter.write(newProducts);
+    await this.#outputWriter.write(address, newProducts);
 
     this.#crawler.closePage(page);
   }

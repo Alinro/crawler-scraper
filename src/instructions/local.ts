@@ -27,9 +27,13 @@ export default {
       selector: "#app div",
     },
     metadata: {
-      price: {
-        property: "href",
-        selector: "a",
+      first: {
+        property: "innerText",
+        selector: "p.first",
+      },
+      second: {
+        property: "innerText",
+        selector: "p.second",
       },
     },
   },

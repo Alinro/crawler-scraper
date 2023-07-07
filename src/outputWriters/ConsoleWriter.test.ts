@@ -14,12 +14,12 @@ describe("ConsoleWriter", function () {
 
   describe("write", function () {
     it("should not log anything when receiving an empty array", () => {
-      consoleWriter.write([]);
+      consoleWriter.write("", []);
       expect(spy).not.toBeCalled();
     });
 
     it("should log correct information", () => {
-      consoleWriter.write([
+      consoleWriter.write("", [
         { key1: "value1", key2: "value2" },
         { key3: "value3", key4: "value4" },
       ]);

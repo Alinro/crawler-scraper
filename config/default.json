@@ -1,14 +1,21 @@
 {
   "instructionSet": "local",
-  "outputType": "console",
+  "outputType": "database",
   "tabCount": 5,
 
   "puppeteer": {
     "headless": true,
     "devtools": false
   },
-  "htmlWriter": {
-    "file": "output.html"
+  "writer": {
+    "html": {
+      "file": "output.html"
+    },
+    "database": {
+      "connectionString": "mongodb://localhost",
+      "database": "crawler-scraper",
+      "collection": "metadata"
+    }
   },
   "delay": 2000
 }
