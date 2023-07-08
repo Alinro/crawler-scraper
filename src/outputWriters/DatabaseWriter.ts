@@ -3,19 +3,14 @@ import { AbstractWriter } from "./types";
 import config from "config";
 
 export default class DatabaseWriter extends AbstractWriter {
-  #client: MongoClient | undefined;
-  #collection: Collection | undefined;
+  #client: MongoClient;
+  #collection: Collection;
 
-  async init() {
-    const { connectionString, database, collection } = config.get<{
-      connectionString: string;
-      database: string;
-      collection: string;
-    }>("writer.database");
+  constructor(client: MongoClient, collection: Collection) {
+    super();
 
-    this.#client = await MongoClient.connect(connectionString);
-    const db = this.#client.db(database);
-    this.#collection = db.collection(collection);
+    this.#client = client;
+    this.#collection = collection;
   }
 
   async write(address: string, elements: Record<string, string>[]) {
@@ -23,14 +18,10 @@ export default class DatabaseWriter extends AbstractWriter {
       return;
     }
 
-    if (!this.#collection) {
-      await this.init();
-    }
-
-    await this.#collection?.insertOne({ address, metadata: elements });
+    await this.#collection.insertOne({ address, metadata: elements });
   }
 
   async close() {
-    await this.#client?.close();
+    await this.#client.close();
   }
 }

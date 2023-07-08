@@ -10,7 +10,9 @@ import config from "config";
     const instructions = await getInstructions(config.get("instructionSet"));
 
     const crawler = new PuppeteerCrawler();
-    const outputWriter = getOutputWriterInstance(config.get("outputType"));
+    const outputWriter = await getOutputWriterInstance(
+      config.get("outputType")
+    );
 
     const scrapingCoordinator = new ScrapingCoordinator(
       crawler,
