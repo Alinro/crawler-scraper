@@ -34,12 +34,12 @@ export default class ScrapingCoordinator {
    */
   #pagesToVisit: string[] = [];
 
-  #tabCount: number = 1;
+  #tabCount = 1;
 
   constructor(
     crawler: CrawlerInterface,
     outputWriter: AbstractWriter,
-    instructions: Instructions
+    instructions: Instructions,
   ) {
     this.#crawler = crawler;
     this.#instructions = instructions;
@@ -65,7 +65,7 @@ export default class ScrapingCoordinator {
 
       for (let i = 0; i < this.#tabCount; i++) {
         promises.push(
-          this.#initializeAddressProcessing(this.#pagesToVisit.pop())
+          this.#initializeAddressProcessing(this.#pagesToVisit.pop()),
         );
       }
 
@@ -110,22 +110,22 @@ export default class ScrapingCoordinator {
     const page = await this.#crawler.gotoAddress(address);
 
     if (isFirstPage) {
-      this.#processLinks(page, this.#instructions.clickOnce);
+      await this.#processLinks(page, this.#instructions.clickOnce);
     }
 
-    this.#processLinks(page, this.#instructions.click);
+    await this.#processLinks(page, this.#instructions.click);
 
     const { container, metadata } = this.#instructions.item;
     const newProducts = await this.#crawler.getElements(
       page,
       container,
-      metadata
+      metadata,
     );
 
     console.log(`Discovered ${JSON.stringify(newProducts)} products.`);
     await this.#outputWriter.write(address, newProducts);
 
-    this.#crawler.closePage(page);
+    await this.#crawler.closePage(page);
   }
 
   async #processLinks(page: Page, linkInstructions: InstructionStep) {
@@ -133,11 +133,11 @@ export default class ScrapingCoordinator {
     const newPagesToVisit = await this.#crawler.getElements(
       page,
       container,
-      metadata
+      metadata,
     );
 
     console.log(
-      `Discovered ${JSON.stringify(newPagesToVisit)} pages to visit.`
+      `Discovered ${JSON.stringify(newPagesToVisit)} pages to visit.`,
     );
 
     newPagesToVisit.forEach((page) => {

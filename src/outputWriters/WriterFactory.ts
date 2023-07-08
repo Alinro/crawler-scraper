@@ -5,9 +5,15 @@ import HtmlWriter from "./HtmlWriter";
 import { AbstractWriter } from "./types";
 import { MongoClient } from "mongodb";
 
-const mapping: Record<string, () => Promise<AbstractWriter>> = {
-  console: async () => new ConsoleWriter(),
-  html: async () => new HtmlWriter(),
+const ALLOWED_WRITERS = ["console", "html", "database"] as const;
+type ALLOWED_WRITERS = (typeof ALLOWED_WRITERS)[number];
+
+const mapping: Record<
+  ALLOWED_WRITERS,
+  () => Promise<AbstractWriter> | AbstractWriter
+> = {
+  console: () => new ConsoleWriter(),
+  html: () => new HtmlWriter(),
   database: async () => {
     const { connectionString, database, collection } = config.get<{
       connectionString: string;
@@ -22,11 +28,15 @@ const mapping: Record<string, () => Promise<AbstractWriter>> = {
   },
 };
 
+const isAllowedWriter = (type: string): type is ALLOWED_WRITERS => {
+  return ALLOWED_WRITERS.includes(type as ALLOWED_WRITERS);
+};
+
 export const getOutputWriterInstance = async (
-  type: string
+  type: string,
 ): Promise<AbstractWriter> => {
-  if (!mapping[type]) {
-    throw `Output writer with type ${type} does not exist`;
+  if (!isAllowedWriter(type)) {
+    throw Error(`Output writer with type ${type} does not exist`);
   }
 
   return await mapping[type]();

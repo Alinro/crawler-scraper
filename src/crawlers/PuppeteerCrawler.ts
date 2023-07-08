@@ -1,4 +1,4 @@
-import puppeteer, { Browser, HTTPResponse, Page } from "puppeteer";
+import puppeteer, { Browser, Page } from "puppeteer";
 import config from "config";
 
 import { CrawlerInterface } from "./types";
@@ -25,7 +25,7 @@ export default class PuppeteerCrawler implements CrawlerInterface {
   async gotoAddress(address: string) {
     if (!this.#browser) {
       throw new Error(
-        "Please initialize the browser instance before navigating to an address"
+        "Please initialize the browser instance before navigating to an address",
       );
     }
 
@@ -43,9 +43,9 @@ export default class PuppeteerCrawler implements CrawlerInterface {
   async getElements(
     page: Page,
     containerConfig: ContainerConfig,
-    metadataConfig: MetadataConfig
+    metadataConfig: MetadataConfig,
   ): Promise<Elements> {
-    return page?.evaluate(
+    return page.evaluate(
       (containerConfig, metadataConfig) => {
         const containers = document.querySelectorAll(containerConfig.selector);
 
@@ -55,13 +55,13 @@ export default class PuppeteerCrawler implements CrawlerInterface {
           const element: Record<string, string> = {};
 
           for (const [key, { property, selector }] of Object.entries(
-            metadataConfig
+            metadataConfig,
           )) {
             if (selector) {
               const htmlElement = container.querySelector(selector);
               if (!htmlElement) {
                 console.warn(
-                  `Can't find ${selector} in container ${containerConfig.selector}`
+                  `Can't find ${selector} in container ${containerConfig.selector}`,
                 );
                 continue;
               }
@@ -80,7 +80,7 @@ export default class PuppeteerCrawler implements CrawlerInterface {
         return metadata;
       },
       containerConfig,
-      metadataConfig
+      metadataConfig,
     );
   }
 

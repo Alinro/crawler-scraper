@@ -1,7 +1,7 @@
 import { Elements, AbstractWriter } from "./types";
 
 export default class ConsoleWriter extends AbstractWriter {
-  async write(address: string, elements: Elements) {
+  write(address: string, elements: Elements) {
     if (elements.length === 0) {
       return;
     }

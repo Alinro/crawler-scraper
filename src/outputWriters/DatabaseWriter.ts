@@ -1,6 +1,5 @@
 import { Collection, MongoClient } from "mongodb";
 import { AbstractWriter } from "./types";
-import config from "config";
 
 export default class DatabaseWriter extends AbstractWriter {
   #client: MongoClient;

@@ -10,7 +10,7 @@ export interface CrawlerInterface {
   getElements: (
     page: Page,
     containerConfig: ContainerConfig,
-    metadataConfig: MetadataConfig
+    metadataConfig: MetadataConfig,
   ) => Promise<Elements>;
 
   closeBrowser: () => Promise<void>;

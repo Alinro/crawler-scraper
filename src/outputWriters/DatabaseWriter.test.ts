@@ -1,6 +1,5 @@
 import DatabaseWriter from "./DatabaseWriter";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import config from "config";
 import { Collection, MongoClient } from "mongodb";
 
 describe("DatabaseWriter", () => {
@@ -24,6 +23,7 @@ describe("DatabaseWriter", () => {
     await writer.write("test", [{ key1: "value1", key2: "value2" }]);
 
     expect(await collection.findOne()).toEqual({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       _id: expect.anything(),
       address: "test",
       metadata: [{ key1: "value1", key2: "value2" }],
@@ -46,16 +46,19 @@ describe("DatabaseWriter", () => {
 
     expect(await collection.find().toArray()).toEqual([
       {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         _id: expect.anything(),
         address: "test",
         metadata: [{ key1: "value1", key2: "value2" }],
       },
       {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         _id: expect.anything(),
         address: "test",
         metadata: [{ key3: "value3", key4: "value4" }],
       },
       {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         _id: expect.anything(),
         address: "test",
         metadata: [{ key5: "value5", key6: "value6" }],

@@ -1,7 +1,9 @@
 export type Elements = Record<string, string>[];
 
 export abstract class AbstractWriter {
-  abstract write(address: string, elements: Elements): Promise<void>;
+  abstract write(address: string, elements: Elements): Promise<void> | void;
 
-  async close() {}
+  async close() {
+    // do nothing
+  }
 }

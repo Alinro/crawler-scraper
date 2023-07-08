@@ -2,12 +2,12 @@ export interface ContainerConfig {
   selector: string;
 }
 
-export interface MetadataConfig {
-  [key: string]: {
-    property: keyof Element;
-    selector: string;
-  };
+interface MetadataConfigItem {
+  property: keyof Element;
+  selector: string;
 }
+
+export type MetadataConfig = Record<string, MetadataConfigItem>;
 
 export interface InstructionStep {
   container: ContainerConfig;

@@ -3,7 +3,7 @@ import { Elements, AbstractWriter } from "./types";
 import config from "config";
 
 export default class HtmlWriter extends AbstractWriter {
-  async write(address: string, elements: Record<string, string>[]) {
+  write(address: string, elements: Record<string, string>[]) {
     if (elements.length === 0) {
       return;
     }

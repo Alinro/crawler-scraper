@@ -5,19 +5,19 @@ import { getInstructions } from "./instructions/index";
 
 import config from "config";
 
-(async () => {
+void (async () => {
   try {
-    const instructions = await getInstructions(config.get("instructionSet"));
+    const instructions = getInstructions(config.get("instructionSet"));
 
     const crawler = new PuppeteerCrawler();
     const outputWriter = await getOutputWriterInstance(
-      config.get("outputType")
+      config.get("outputType"),
     );
 
     const scrapingCoordinator = new ScrapingCoordinator(
       crawler,
       outputWriter,
-      instructions
+      instructions,
     );
 
     await scrapingCoordinator.start();
