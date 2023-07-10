@@ -19,7 +19,7 @@ describe("DatabaseWriter", () => {
   });
 
   it("should write to the database when called once", async () => {
-    const writer = new DatabaseWriter(client, collection);
+    const writer = new DatabaseWriter();
     await writer.write("test", [{ key1: "value1", key2: "value2" }]);
 
     expect(await collection.findOne()).toEqual({
@@ -31,14 +31,14 @@ describe("DatabaseWriter", () => {
   });
 
   it("should not write to the database when receiving an empty array", async () => {
-    const writer = new DatabaseWriter(client, collection);
+    const writer = new DatabaseWriter();
     await writer.write("test", []);
 
     expect(await collection.findOne()).toBeNull();
   });
 
   it("should write to the database when called multiple times", async () => {
-    const writer = new DatabaseWriter(client, collection);
+    const writer = new DatabaseWriter();
 
     await writer.write("test", [{ key1: "value1", key2: "value2" }]);
     await writer.write("test", [{ key3: "value3", key4: "value4" }]);
@@ -67,7 +67,7 @@ describe("DatabaseWriter", () => {
   });
 
   it("should not write to the database when called multiple times with empty arrays", async () => {
-    const writer = new DatabaseWriter(client, collection);
+    const writer = new DatabaseWriter();
 
     await writer.write("test", []);
     await writer.write("test", []);

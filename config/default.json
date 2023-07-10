@@ -7,13 +7,15 @@
     "headless": true,
     "devtools": false
   },
+  "database": {
+    "connectionString": "mongodb://localhost",
+    "database": "crawler-scraper"
+  },
   "writer": {
     "html": {
       "file": "output.html"
     },
     "database": {
-      "connectionString": "mongodb://localhost",
-      "database": "crawler-scraper",
       "collection": "metadata"
     }
   },
