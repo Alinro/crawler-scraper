@@ -5,6 +5,22 @@ import { AbstractWriter } from "./outputWriters/types";
 import { wait } from "./utils";
 
 import config from "config";
+import { databaseManager } from "./DatabaseManager";
+import { Collection } from "mongodb";
+
+enum PageStatus {
+  Pending = "pending",
+  Processing = "processing",
+  Done = "done",
+}
+
+interface PageToVisitSchema {
+  link: string;
+  status?: PageStatus;
+  discoveredAt?: Date;
+  startedAt?: Date;
+  finishedAt?: Date;
+}
 
 export default class ScrapingCoordinator {
   /**
@@ -24,17 +40,9 @@ export default class ScrapingCoordinator {
    */
   #instructions;
 
-  /**
-   * @var {Set} pagesAlreadyVisited a set of pages that we already visited (so we don't visit the same page multiple times)
-   */
-  #pagesAlreadyVisited = new Set();
-
-  /**
-   * @var {Array} pagesToVisit a collection of pages that are going to be visited
-   */
-  #pagesToVisit: string[] = [];
-
   #tabCount = 1;
+
+  #pageCollection: Collection<PageToVisitSchema>;
 
   constructor(
     crawler: CrawlerInterface,
@@ -45,8 +53,12 @@ export default class ScrapingCoordinator {
     this.#instructions = instructions;
     this.#outputWriter = outputWriter;
 
-    this.#delayTimer = config.get<number>("delay");
-    this.#tabCount = config.get<number>("tabCount");
+    this.#delayTimer = config.get<number>("coordinator.delay");
+    this.#tabCount = config.get<number>("coordinator.tabCount");
+
+    this.#pageCollection = databaseManager.collection<PageToVisitSchema>(
+      config.get<string>("coordinator.pageCollection"),
+    );
   }
 
   /**
@@ -58,36 +70,47 @@ export default class ScrapingCoordinator {
     console.log(`Processing page: ${this.#instructions.startAddress}`);
     await this.#processAddress(this.#instructions.startAddress, true);
 
-    while (this.#pagesToVisit.length > 0) {
+    while ((await this.#countPagesToVisit()) > 0) {
+      console.log(`Starting to process new batch of ${this.#tabCount} pages`);
+
       await wait(this.#delayTimer);
 
       const promises: Promise<void>[] = [];
 
       for (let i = 0; i < this.#tabCount; i++) {
         promises.push(
-          this.#initializeAddressProcessing(this.#pagesToVisit.pop()),
+          this.#initializeAddressProcessing(await this.#getPageToVisit()),
         );
       }
 
       await Promise.allSettled(promises);
-
-      console.log(`${this.#pagesToVisit.length} pages remaining`);
     }
 
     console.log(`Finished processing. Closing browser`);
 
     await this.#crawler.closeBrowser();
-    await this.#outputWriter.close();
+  }
+
+  async #countPagesToVisit() {
+    return this.#pageCollection.countDocuments({
+      status: PageStatus.Pending,
+    });
+  }
+
+  async #getPageToVisit() {
+    const result = await this.#pageCollection.findOneAndUpdate(
+      {
+        status: PageStatus.Pending,
+      },
+      { $set: { status: PageStatus.Processing, startedAt: new Date() } },
+    );
+
+    return result.value?.link;
   }
 
   async #initializeAddressProcessing(address: string | undefined) {
     if (!address) {
       console.log(`Empty or nonexistant page. Skipping`);
-      return;
-    }
-
-    if (this.#pagesAlreadyVisited.has(address)) {
-      console.log(`Duplicate page: ${address}. Skipping`);
       return;
     }
 
@@ -106,7 +129,6 @@ export default class ScrapingCoordinator {
    *
    */
   async #processAddress(address: string, isFirstPage = false) {
-    this.#pagesAlreadyVisited.add(address);
     const page = await this.#crawler.gotoAddress(address);
 
     if (isFirstPage) {
@@ -123,9 +145,22 @@ export default class ScrapingCoordinator {
     );
 
     console.log(`Discovered ${JSON.stringify(newProducts)} products.`);
+
     await this.#outputWriter.write(address, newProducts);
 
     await this.#crawler.closePage(page);
+
+    await this.#pageCollection.updateOne(
+      {
+        link: address,
+      },
+      {
+        $set: {
+          status: PageStatus.Done,
+          finishedAt: new Date(),
+        },
+      },
+    );
   }
 
   async #processLinks(page: Page, linkInstructions: InstructionStep) {
@@ -140,8 +175,13 @@ export default class ScrapingCoordinator {
       `Discovered ${JSON.stringify(newPagesToVisit)} pages to visit.`,
     );
 
-    newPagesToVisit.forEach((page) => {
-      this.#pagesToVisit.push(page.link);
-    }, this);
+    await this.#pageCollection.insertMany(
+      newPagesToVisit.map((i) => ({
+        link: i.link,
+        status: PageStatus.Pending,
+        discoveredAt: new Date(),
+      })),
+      { ordered: false }, // ignore duplicates
+    );
   }
 }

@@ -1,5 +1,5 @@
 import config from "config";
-import { Db, MongoClient } from "mongodb";
+import { Db, MongoClient, Document } from "mongodb";
 
 class DatabaseManager {
   #client: MongoClient | undefined;
@@ -16,12 +16,12 @@ class DatabaseManager {
     this.#db = this.#client.db(database);
   }
 
-  collection(collection: string) {
+  collection<TSchema extends Document = Document>(collection: string) {
     if (!this.#db) {
       throw Error("Database not connected");
     }
 
-    return this.#db.collection(collection);
+    return this.#db.collection<TSchema>(collection);
   }
 
   async close() {

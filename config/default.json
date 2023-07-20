@@ -1,7 +1,6 @@
 {
   "instructionSet": "local",
   "outputType": "database",
-  "tabCount": 5,
 
   "puppeteer": {
     "headless": true,
@@ -19,5 +18,9 @@
       "collection": "metadata"
     }
   },
-  "delay": 2000
+  "coordinator": {
+    "delay": 2000,
+    "tabCount": 5,
+    "pageCollection": "page"
+  }
 }
