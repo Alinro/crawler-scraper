@@ -7,20 +7,7 @@ import { wait } from "./utils";
 import config from "config";
 import { databaseManager } from "./DatabaseManager";
 import { Collection } from "mongodb";
-
-enum PageStatus {
-  Pending = "pending",
-  Processing = "processing",
-  Done = "done",
-}
-
-interface PageToVisitSchema {
-  link: string;
-  status?: PageStatus;
-  discoveredAt?: Date;
-  startedAt?: Date;
-  finishedAt?: Date;
-}
+import { PageStatus, PageToVisitSchema } from "./types";
 
 export default class ScrapingCoordinator {
   /**
