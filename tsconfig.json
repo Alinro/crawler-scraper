@@ -3,7 +3,8 @@
   "compilerOptions": {
     "lib": ["es2023", "DOM"],
     "outDir": "build",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "sourceMap": true
   },
   "include": ["src/**/*.ts"],
   "ts-node": {
