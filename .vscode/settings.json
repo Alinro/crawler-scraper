@@ -1,0 +1,8 @@
+{
+  "editor.codeActionsOnSave": {
+    // Make sure eslint runs after prettier
+    "source.organizeImports": true,
+    "source.formatDocument": true,
+    "source.fixAll.eslint": true
+  }
+}
