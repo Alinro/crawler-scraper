@@ -7,7 +7,7 @@
     "build": "tsc --build",
     "lint": "eslint . --ext .ts",
     "prestart": "npm run build",
-    "start": "node build/index.js",
+    "start": "node build/src/index.js",
     "test": "jest"
   },
   "dependencies": {
