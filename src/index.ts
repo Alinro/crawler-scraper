@@ -1,9 +1,10 @@
-import PuppeteerCrawler from "./crawlers/PuppeteerCrawler";
 import ScrapingCoordinator from "./ScrapingCoordinator";
-import { getOutputWriterInstance } from "./outputWriters/WriterFactory";
+import PuppeteerCrawler from "./crawlers/PuppeteerCrawler";
 import { getInstructions } from "./instructions/index";
+import { getOutputWriterInstance } from "./outputWriters/WriterFactory";
 
 import config from "config";
+import type { Page } from "puppeteer";
 import { databaseManager } from "./DatabaseManager";
 
 void (async () => {
@@ -15,7 +16,7 @@ void (async () => {
 
     await databaseManager.connect();
 
-    const scrapingCoordinator = new ScrapingCoordinator(
+    const scrapingCoordinator = new ScrapingCoordinator<Page>(
       crawler,
       outputWriter,
       instructions,

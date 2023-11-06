@@ -1,19 +1,17 @@
-import { Page } from "puppeteer";
-import { CrawlerInterface } from "./crawlers/types";
-import { InstructionStep, Instructions } from "./instructions/types";
-import { AbstractWriter } from "./outputWriters/types";
-import { wait } from "./utils";
-
 import config from "config";
+import type { Collection } from "mongodb";
 import { databaseManager } from "./DatabaseManager";
-import { Collection } from "mongodb";
-import { PageStatus, PageToVisitSchema } from "./types";
+import type { CrawlerInterface } from "./crawlers/types";
+import type { InstructionStep, Instructions } from "./instructions/types";
+import type { AbstractWriter } from "./outputWriters/types";
+import type { PageToVisitSchema } from "./types";
+import { PageStatus } from "./types";
 
-export default class ScrapingCoordinator {
+export default class ScrapingCoordinator<T> {
   /**
    * @var {CrawlerInterface} crawler a class that interacts with the page and its content
    */
-  #crawler: CrawlerInterface;
+  #crawler: CrawlerInterface<T>;
 
   #outputWriter: AbstractWriter;
 
@@ -32,7 +30,7 @@ export default class ScrapingCoordinator {
   #pageCollection: Collection<PageToVisitSchema>;
 
   constructor(
-    crawler: CrawlerInterface,
+    crawler: CrawlerInterface<T>,
     outputWriter: AbstractWriter,
     instructions: Instructions,
   ) {
@@ -54,28 +52,36 @@ export default class ScrapingCoordinator {
   async start() {
     await this.#crawler.init();
 
-    console.log(`Processing page: ${this.#instructions.startAddress}`);
-    await this.#processAddress(this.#instructions.startAddress, true);
+    return new Promise<void>((resolve) => {
+      const onPageClose = async () => {
+        const pageToVisit = await this.#getPageToVisit();
 
-    while ((await this.#countPagesToVisit()) > 0) {
-      console.log(`Starting to process new batch of ${this.#tabCount} pages`);
+        // if nothing is processing and there are no more pages to visit, we're done
+        // TODO there might be a potential race condition here, which should be investigated
+        if (!pageToVisit && !(await this.#crawler.isProcessing())) {
+          console.log("Finished all pages. Closing browser");
+          resolve();
+          return;
+        }
 
-      await wait(this.#delayTimer);
+        // await this.#initializeAddressProcessing(pageToVisit);
+      };
 
-      const promises: Promise<void>[] = [];
+      const onBrowserError = () => {
+        console.error("Browser unexpectedly disconnected");
+        resolve();
+      };
+
+      this.#crawler.setListeners(onPageClose, onBrowserError);
+
+      console.log(`Processing page: ${this.#instructions.startAddress}`);
+
+      void this.#processAddress(this.#instructions.startAddress, true);
 
       for (let i = 0; i < this.#tabCount; i++) {
-        promises.push(
-          this.#initializeAddressProcessing(await this.#getPageToVisit()),
-        );
+        void this.#initializeAddressProcessing();
       }
-
-      await Promise.allSettled(promises);
-    }
-
-    console.log(`Finished processing. Closing browser`);
-
-    await this.#crawler.closeBrowser();
+    });
   }
 
   async #countPagesToVisit() {
@@ -95,7 +101,9 @@ export default class ScrapingCoordinator {
     return result.value?.link;
   }
 
-  async #initializeAddressProcessing(address: string | undefined) {
+  async #initializeAddressProcessing() {
+    const address = await this.#getPageToVisit();
+
     if (!address) {
       console.log(`Empty or nonexistant page. Skipping`);
       return;
@@ -150,7 +158,7 @@ export default class ScrapingCoordinator {
     );
   }
 
-  async #processLinks(page: Page, linkInstructions: InstructionStep) {
+  async #processLinks(page: T, linkInstructions: InstructionStep) {
     const { container, metadata } = linkInstructions;
     const newPagesToVisit = await this.#crawler.getElements(
       page,

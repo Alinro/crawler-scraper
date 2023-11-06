@@ -1,5 +1,6 @@
 import config from "config";
-import { Db, MongoClient, Document } from "mongodb";
+import type { Db, Document } from "mongodb";
+import { MongoClient } from "mongodb";
 
 class DatabaseManager {
   #client: MongoClient | undefined;

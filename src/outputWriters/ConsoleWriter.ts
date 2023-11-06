@@ -1,4 +1,5 @@
-import { Elements, AbstractWriter } from "./types";
+import type { Elements } from "./types";
+import { AbstractWriter } from "./types";
 
 export default class ConsoleWriter extends AbstractWriter {
   write(address: string, elements: Elements) {

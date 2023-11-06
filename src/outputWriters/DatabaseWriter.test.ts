@@ -1,6 +1,7 @@
-import DatabaseWriter from "./DatabaseWriter";
+import type { Collection } from "mongodb";
+import { MongoClient } from "mongodb";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { Collection, MongoClient } from "mongodb";
+import DatabaseWriter from "./DatabaseWriter";
 
 describe("DatabaseWriter", () => {
   let mongod: MongoMemoryServer, client: MongoClient, collection: Collection;

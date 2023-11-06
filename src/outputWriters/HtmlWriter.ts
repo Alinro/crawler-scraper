@@ -1,6 +1,7 @@
-import fs from "fs";
-import { Elements, AbstractWriter } from "./types";
 import config from "config";
+import fs from "fs";
+import type { Elements } from "./types";
+import { AbstractWriter } from "./types";
 
 export default class HtmlWriter extends AbstractWriter {
   write(address: string, elements: Record<string, string>[]) {

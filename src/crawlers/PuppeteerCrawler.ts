@@ -1,11 +1,12 @@
-import puppeteer, { Browser, Page } from "puppeteer";
 import config from "config";
+import type { Browser, Page } from "puppeteer";
+import puppeteer from "puppeteer";
 
-import { CrawlerInterface } from "./types";
-import { ContainerConfig, MetadataConfig } from "../instructions/types";
-import { Elements } from "../outputWriters/types";
+import type { ContainerConfig, MetadataConfig } from "../instructions/types";
+import type { Elements } from "../outputWriters/types";
+import type { CrawlerInterface } from "./types";
 
-export default class PuppeteerCrawler implements CrawlerInterface {
+export default class PuppeteerCrawler implements CrawlerInterface<Page> {
   /**
    * @var {puppeteer.Browser} browser a reference to the browser instance that puppeteer launched
    */
@@ -15,6 +16,22 @@ export default class PuppeteerCrawler implements CrawlerInterface {
     if (!this.#browser) {
       this.#browser = await puppeteer.launch(config.get("puppeteer"));
     }
+  }
+
+  setListeners(onAddressFinished: () => void, onUnexpectedStop: () => void) {
+    if (!this.#browser) {
+      throw new Error(
+        "Please initialize the crawler instance before setting listeners",
+      );
+    }
+
+    this.#browser.on("targetdestroyed", () => {
+      onAddressFinished();
+    });
+
+    this.#browser.on("disconnected", () => {
+      onUnexpectedStop();
+    });
   }
 
   /**
@@ -96,5 +113,10 @@ export default class PuppeteerCrawler implements CrawlerInterface {
    */
   async closePage(page: Page) {
     await page.close();
+  }
+
+  async isProcessing() {
+    const pages = await this.#browser?.pages();
+    return pages?.length !== 0;
   }
 }

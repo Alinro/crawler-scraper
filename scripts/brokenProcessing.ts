@@ -1,6 +1,7 @@
 import config from "config";
 import { MongoClient } from "mongodb";
-import { PageStatus, PageToVisitSchema } from "../src/types";
+import type { PageToVisitSchema } from "../src/types";
+import { PageStatus } from "../src/types";
 
 void (async () => {
   const { connectionString, database } = config.get<{

@@ -1,19 +1,25 @@
-import { Page } from "puppeteer";
-import { ContainerConfig, MetadataConfig } from "../instructions/types";
-import { Elements } from "../outputWriters/types";
+import type { ContainerConfig, MetadataConfig } from "../instructions/types";
+import type { Elements } from "../outputWriters/types";
 
-export interface CrawlerInterface {
+export interface CrawlerInterface<T> {
   init: () => Promise<void>;
 
-  gotoAddress: (address: string) => Promise<Page>;
+  setListeners: (
+    onAddressFinished: () => void | Promise<void>,
+    onUnexpectedStop: () => void | Promise<void>,
+  ) => void;
+
+  gotoAddress: (address: string) => Promise<T>;
 
   getElements: (
-    page: Page,
+    page: T,
     containerConfig: ContainerConfig,
     metadataConfig: MetadataConfig,
   ) => Promise<Elements>;
 
   closeBrowser: () => Promise<void>;
 
-  closePage: (page: Page) => Promise<void>;
+  closePage: (page: T) => Promise<void>;
+
+  isProcessing(): Promise<boolean>;
 }

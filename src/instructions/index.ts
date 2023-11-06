@@ -1,4 +1,4 @@
-import { Instructions } from "./types";
+import type { Instructions } from "./types";
 
 const ALLOWED_INSTRUCTION_SETS = ["oda", "finn", "local"];
 

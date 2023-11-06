@@ -1,7 +1,7 @@
 import ConsoleWriter from "./ConsoleWriter";
 import DatabaseWriter from "./DatabaseWriter";
 import HtmlWriter from "./HtmlWriter";
-import { AbstractWriter } from "./types";
+import type { AbstractWriter } from "./types";
 
 const ALLOWED_WRITERS = ["console", "html", "database"] as const;
 type ALLOWED_WRITERS = (typeof ALLOWED_WRITERS)[number];
